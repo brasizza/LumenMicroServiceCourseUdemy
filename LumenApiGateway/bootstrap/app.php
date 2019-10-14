@@ -26,6 +26,11 @@ $app = new Laravel\Lumen\Application(
  $app->withEloquent();
 
 
+ $app->routeMiddleware([
+    'auth' => App\Http\Middleware\Authenticate::class,
+]);
+
+// Finally register two service providers - original one and Lumen adapter
 
 
 /*
@@ -40,7 +45,7 @@ $app = new Laravel\Lumen\Application(
 */
 
 $app->configure('services');
-
+$app->configure('auth');
 $app->singleton(
     Illuminate\Contracts\Debug\ExceptionHandler::class,
     App\Exceptions\Handler::class
@@ -66,9 +71,10 @@ $app->singleton(
 //     App\Http\Middleware\ExampleMiddleware::class
 // ]);
 
-// $app->routeMiddleware([
-//     'auth' => App\Http\Middleware\Authenticate::class,
-// ]);
+$app->routeMiddleware([
+  //  'auth' => App\Http\Middleware\Authenticate::class,
+  'client.credentials' => Laravel\Passport\Http\Middleware\CheckClientCredentials::class,
+]);
 
 /*
 |--------------------------------------------------------------------------
@@ -82,7 +88,9 @@ $app->singleton(
 */
 
 // $app->register(App\Providers\AppServiceProvider::class);
-// $app->register(App\Providers\AuthServiceProvider::class);
+ $app->register(App\Providers\AuthServiceProvider::class);
+ $app->register(Laravel\Passport\PassportServiceProvider::class);
+ $app->register(Dusterio\LumenPassport\PassportServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 
 /*
